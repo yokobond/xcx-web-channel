@@ -1,0 +1,14 @@
+{
+  "en": {
+    "xcxWebChannel.name": "Web Channel",
+    "xcxWebChannel.doIt": "do it [SCRIPT]"
+  },
+  "ja": {
+    "xcxWebChannel.name": "Web Channel",
+    "xcxWebChannel.doIt": "[SCRIPT] を実行する"
+  },
+  "ja-Hira": {
+    "xcxWebChannel.name": "Web Channel",
+    "xcxWebChannel.doIt": "[SCRIPT] をじっこうする"
+  }
+}

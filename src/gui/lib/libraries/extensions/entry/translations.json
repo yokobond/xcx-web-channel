@@ -1,0 +1,14 @@
+{
+  "en": {
+    "xcxWebChannel.entry.name": "Web Channel",
+    "xcxWebChannel.entry.description": "Description of this extension"
+  },
+  "ja": {
+    "xcxWebChannel.entry.name": "Web Channel",
+    "xcxWebChannel.entry.description": "拡張機能の説明"
+  },
+  "ja-Hira": {
+    "xcxWebChannel.entry.name": "Web Channel",
+    "xcxWebChannel.entry.description": "かくちょうきのうのせつめい"
+  }
+}
