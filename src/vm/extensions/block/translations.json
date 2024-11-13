@@ -1,14 +1,62 @@
 {
   "en": {
     "xcxWebChannel.name": "Web Channel",
-    "xcxWebChannel.doIt": "do it [SCRIPT]"
+    "xcxWebChannel.joinChannel": "join channel [CHANNEL] on server [URI]",
+    "xcxWebChannel.joinChannel.defaultChannel": " ",
+    "xcxWebChannel.joinChannel.defaultURI": "s1.yengawa.com/wc",
+    "xcxWebChannel.reportServerURI": "server",
+    "xcxWebChannel.reportChannelName": "channel name",
+    "xcxWebChannel.leaveChannel": "leave channel",
+    "xcxWebChannel.valueOf": "value of [KEY]",
+    "xcxWebChannel.valueOf.defaultKey": "key",
+    "xcxWebChannel.setValue": "set value of [KEY] to [VALUE]",
+    "xcxWebChannel.setValue.defaultKey": "key",
+    "xcxWebChannel.setValue.defaultValue": "value",
+    "xcxWebChannel.sendEvent": "send event [TYPE] with [DATA]",
+    "xcxWebChannel.sendEvent.defaultEvent": "type",
+    "xcxWebChannel.sendEvent.defaultData": "data",
+    "xcxWebChannel.whenEventReceived": "when event received",
+    "xcxWebChannel.lastEventType": "event type",
+    "xcxWebChannel.lastEventData": "event data"
   },
   "ja": {
     "xcxWebChannel.name": "Web Channel",
-    "xcxWebChannel.doIt": "[SCRIPT] を実行する"
+    "xcxWebChannel.joinChannel": "[URI] サーバーの [CHANNEL] チャンネルに参加する",
+    "xcxWebChannel.joinChannel.defaultChannel": " ",
+    "xcxWebChannel.joinChannel.defaultURI": "s1.yengawa.com/wc",
+    "xcxWebChannel.reportServerURI": "サーバー",
+    "xcxWebChannel.reportChannelName": "チャンネル名",
+    "xcxWebChannel.leaveChannel": "チャンネルから抜ける",
+    "xcxWebChannel.valueOf": "[KEY] の値",
+    "xcxWebChannel.valueOf.defaultKey": "キー",
+    "xcxWebChannel.setValue": "[KEY] の値を [VALUE] に設定する",
+    "xcxWebChannel.setValue.defaultKey": "キー",
+    "xcxWebChannel.setValue.defaultValue": "値",
+    "xcxWebChannel.sendEvent": "[TYPE] イベントを [DATA] と共に送る",
+    "xcxWebChannel.sendEvent.defaultEvent": "タイプ",
+    "xcxWebChannel.sendEvent.defaultData": "データ",
+    "xcxWebChannel.whenEventReceived": "イベントを受け取ったとき",
+    "xcxWebChannel.lastEventType": "イベント タイプ",
+    "xcxWebChannel.lastEventData": "イベント データ"
   },
   "ja-Hira": {
-    "xcxWebChannel.name": "Web Channel",
-    "xcxWebChannel.doIt": "[SCRIPT] をじっこうする"
+    "xcxWebChannel.name": "ウェブ チャンネル",
+    "xcxWebChannel.joinChannel": "[URI] サーバーの [CHANNEL] チャンネル に さんか する",
+    "xcxWebChannel.joinChannel.defaultChannel": " ",
+    "xcxWebChannel.joinChannel.defaultURI": "s1.yengawa.com/wc",
+    "xcxWebChannel.reportServerURI": "サーバー",
+    "xcxWebChannel.reportChannelName": "チャンネルめい",
+    "xcxWebChannel.leaveChannel": "チャンネル から ぬける",
+    "xcxWebChannel.valueOf": "[KEY] の あたい",
+    "xcxWebChannel.valueOf.defaultKey": "キー",
+    "xcxWebChannel.setValue": "[KEY] の あたい を [VALUE] に せってい する",
+    "xcxWebChannel.setValue.defaultKey": "キー",
+    "xcxWebChannel.setValue.defaultValue": "あたい",
+    "xcxWebChannel.sendEvent": "[TYPE] イベント を [DATA] と ともに おくる",
+    "xcxWebChannel.sendEvent.defaultEvent": "タイプ",
+    "xcxWebChannel.sendEvent.defaultData": "データ",
+    "xcxWebChannel.whenEventReceived": "イベント を うけとった とき",
+    "xcxWebChannel.lastEventType": "イベント タイプ",
+    "xcxWebChannel.lastEventData": "イベント データ"
   }
 }

@@ -4,6 +4,7 @@ import Cast from '../../util/cast';
 import log from '../../util/log';
 import translations from './translations.json';
 import blockIcon from './block-icon.png';
+import {WebChannelSession} from './web-channel-session';
 
 /**
  * Formatter which is used for translation.
@@ -98,6 +99,12 @@ class ExtensionBlocks {
             // Replace 'formatMessage' to a formatter which is used in the runtime.
             formatMessage = runtime.formatMessage;
         }
+
+        /**
+         * The channel session.
+         * @type {?WebChannelSession}
+         */
+        this.channelSession = null;
     }
 
     /**
@@ -113,20 +120,166 @@ class ExtensionBlocks {
             showStatusButton: false,
             blocks: [
                 {
-                    opcode: 'do-it',
+                    opcode: 'joinChannel',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.joinChannel',
+                        default: 'join channel [CHANNEL] on server [URI]'
+                    }),
+                    func: 'joinChannel',
+                    arguments: {
+                        CHANNEL: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.joinChannel.defaultChannel',
+                                default: ' '
+                            })
+                        },
+                        URI: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.joinChannel.defaultURI',
+                                default: 's1.yengawa.com/wc'
+                            })
+                        }
+                    }
+                },
+                {
+                    opcode: 'reportServerURI',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: true,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.reportServerURI',
+                        default: 'server'
+                    }),
+                    func: 'reportServerURI'
+                },
+                {
+                    opcode: 'reportChannelName',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: true,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.reportChannelName',
+                        default: formatMessage({
+                            id: 'xcxWebChannel.reportChannelName',
+                            default: 'channel name'
+                        })
+                    }),
+                    func: 'reportChannelName',
+                    arguments: {}
+                },
+                {
+                    opcode: 'leaveChannel',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.leaveChannel',
+                        default: 'leave channel'
+                    }),
+                    func: 'leaveChannel',
+                    arguments: {}
+                },
+                '---',
+                {
+                    opcode: 'setValue',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.setValue',
+                        default: 'set value of [KEY] to [VALUE]',
+                        description: 'set value of the key'
+                    }),
+                    func: 'setValue',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.setValue.defaultKey',
+                                default: 'key'
+                            })
+                        },
+                        VALUE: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.setValue.defaultValue',
+                                default: 'value'
+                            })
+                        }
+                    }
+                },
+                {
+                    opcode: 'valueOf',
                     blockType: BlockType.REPORTER,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'xcxWebChannel.doIt',
-                        default: 'do it [SCRIPT]',
-                        description: 'execute javascript for example'
+                        id: 'xcxWebChannel.valueOf',
+                        default: 'value of [KEY]'
                     }),
-                    func: 'doIt',
+                    func: 'valueOf',
                     arguments: {
-                        SCRIPT: {
+                        KEY: {
                             type: ArgumentType.STRING,
-                            defaultValue: '3 + 4'
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.valueOf.defaultKey',
+                                default: 'key'
+                            })
                         }
+                    }
+                },
+                '---',
+                {
+                    opcode: 'sendEvent',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.sendEvent',
+                        default: 'send event [TYPE] with [DATA]'
+                    }),
+                    arguments: {
+                        TYPE: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.sendEvent.defaultEvent',
+                                default: 'event'
+                            })
+                        },
+                        DATA: {
+                            type: ArgumentType.STRING,
+                            defaultValue: formatMessage({
+                                id: 'xcxWebChannel.sendEvent.defaultData',
+                                default: 'data'
+                            })
+                        }
+                    }
+                },
+                {
+                    opcode: 'whenEventReceived',
+                    blockType: BlockType.EVENT,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.whenEventReceived',
+                        default: 'when event received'
+                    }),
+                    isEdgeActivated: false,
+                    shouldRestartExistingThreads: false
+                },
+                {
+                    opcode: 'lastEventType',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: true,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.lastEventType',
+                        default: 'event'
+                    })
+                },
+                {
+                    opcode: 'lastEventData',
+                    blockType: BlockType.REPORTER,
+                    disableMonitor: true,
+                    text: formatMessage({
+                        id: 'xcxWebChannel.lastEventData',
+                        default: 'data of event'
+                    }),
+                    arguments: {
                     }
                 }
             ],
@@ -135,11 +288,208 @@ class ExtensionBlocks {
         };
     }
 
-    doIt (args) {
-        const statement = Cast.toString(args.SCRIPT);
-        const func = new Function(`return (${statement})`);
-        log.log(`doIt: ${statement}`);
-        return func.call(this);
+    /**
+     * Connect to the server.
+     * @param {object} args - arguments for the block.
+     * @param {string} args.CHANNEL - the channel name.
+     * @param {string} args.URI - the URI of the server.
+     * @param {object} util - utility object provided by the runtime.
+     * @return {Promise<string>} - resolve with the result of connecting to the server.
+     */
+    joinChannel (args, util) {
+        const channel = Cast.toString(args.CHANNEL).trim();
+        const uri = Cast.toString(args.URI).trim();
+        if (this.serverSocket && (this.serverURI === uri)) {
+            return Promise.resolve(`already connected: ${uri}`);
+        }
+        if (this.isConnecting) {
+            if (util) {
+                util.yield();
+            }
+            return;
+        }
+        this.isConnecting = true;
+        if (this.channelSession) {
+            this.leaveChannel();
+        }
+        const connectionPromise = new Promise((resolve, reject) => {
+            const socket = new WebSocket(`wss://${uri}`);
+            socket.addEventListener('open', () => {
+                this.serverSocket = socket;
+                this.serverURI = uri;
+                socket.addEventListener('close', () => {
+                    this.leaveChannel();
+                    log.info(`WebSocket closed: ${uri}`);
+                });
+                socket.addEventListener('error', error => {
+                    log.error(`WebSocket error: ${error.message}`);
+                });
+                this.channelSession = new WebChannelSession(channel, socket);
+                this.channelSession.addBroadcastEventListener(this.onEvent.bind(this));
+                this.channelSession.open()
+                    .then(() => {
+                        log.info(`WebSocket connected: ${uri}`);
+                        resolve(`connected to "${this.channelSession.channelName}" on "wss://${uri}"`);
+                    })
+                    .catch(error => {
+                        this.leaveChannel();
+                        reject(error);
+                    });
+            });
+        });
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+                reject(new Error('WebSocket connection timeout after 10s'));
+            }, 10000);
+        });
+        return Promise.race([connectionPromise, timeoutPromise])
+            .catch(error => {
+                this.leaveChannel();
+                log.error(`joinChannel: ${error.message}`);
+                return error.message;
+            })
+            .finally(() => {
+                this.isConnecting = false;
+            });
+    }
+
+    /**
+     * Disconnect from the server.
+     */
+    disconnectServer () {
+        if (this.serverSocket) {
+            if (this.serverSocket.readyState !== WebSocket.CLOSED) {
+                this.serverSocket.close();
+            }
+            this.serverSocket = null;
+            const serverURI = this.serverURI;
+            this.serverURI = null;
+            log.info(`WebSocket disconnected: ${serverURI}`);
+        }
+    }
+
+    /**
+     * Return the server URI.
+     * @return {string} - the server URI.
+     */
+    reportServerURI () {
+        return this.serverURI ? this.serverURI : '';
+    }
+
+    /**
+     * Leave the current channel.
+     * @return {string} - the result of leaving the channel.
+     */
+    leaveChannel () {
+        const channelName = this.channelSession ? this.channelSession.channelName : null;
+        if (this.channelSession) {
+            this.channelSession.close();
+            this.channelSession = null;
+            log.info(`left from ${channelName}`);
+        }
+        this.disconnectServer();
+        return channelName ? `left from ${channelName}` : 'no channel joined';
+    }
+
+    /**
+     * Return the channel name.
+     * @return {string} - the channel name.
+     */
+    reportChannelName () {
+        return this.channelSession ? this.channelSession.channelName : 'no channel joined';
+    }
+
+    /**
+     * Return the value of the key.
+     * @param {object} args - arguments for the block.
+     * @param {string} args.KEY - the key.
+     * @return {string} - the value of the key.
+     */
+    valueOf (args) {
+        const key = Cast.toString(args.KEY);
+        if (!this.channelSession) {
+            return '';
+        }
+        const value = this.channelSession.getValue(key);
+        return value ? value : '';
+    }
+
+    /**
+     * Set the value of the key.
+     * @param {object} args - arguments for the block.
+     * @param {string} args.KEY - the key.
+     * @param {string} args.VALUE - the value.
+     * @return {string} - the result of setting the value.
+     */
+    setValue (args) {
+        const key = Cast.toString(args.KEY);
+        const value = Cast.toString(args.VALUE);
+        log.debug(`setValue: ${key} = ${value}`);
+        if (!this.channelSession) {
+            return 'no channel joined';
+        }
+        try {
+            this.channelSession.setValue(key, value);
+        } catch (error) {
+            return error.message;
+        }
+        // resolve after a delay to process another message when this block is used in a loop.
+        return Promise.resolve(`set ${key} = ${value}`);
+    }
+
+    /**
+     * Handle the event.
+     * @param {object} event - the event.
+     */
+    onEvent () {
+        this.runtime.startHats('xcxWebChannel_whenEventReceived');
+    }
+
+    /**
+     * Return the last event type.
+     * @return {string} - the last event type.
+     */
+    lastEventType () {
+        if (!this.channelSession) {
+            return '';
+        }
+        const event = this.channelSession.lastEvent;
+        return event ? event.type : '';
+    }
+
+    /**
+     * Return the last event data.
+     * @return {string} - the last event data.
+     */
+    lastEventData () {
+        const event = this.channelSession ? this.channelSession.lastEvent : null;
+        if (!event) {
+            return '';
+        }
+        const data = event.data;
+        return data ? data : '';
+    }
+
+    /**
+     * Send the event.
+     * @param {object} args - arguments for the block.
+     * @param {string} args.TYPE - the event type.
+     * @param {string} args.DATA - the event data.
+     * @return {Promise<string>} - resolve with the result of sending the event.
+     */
+    sendEvent (args) {
+        const type = Cast.toString(args.TYPE).trim();
+        const data = Cast.toString(args.DATA);
+        if (!this.channelSession) {
+            return Promise.resolve('no channel joined');
+        }
+        try {
+            this.channelSession.broadcastEvent(type, data);
+        } catch (error) {
+            return Promise.resolve(error.message);
+        }
+        // resolve after a delay for the broadcast event to be received.
+        return Promise.resolve(`sent event: ${type} data: ${data}`);
     }
 }
 
