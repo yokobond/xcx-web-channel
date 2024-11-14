@@ -1,13 +1,42 @@
 # Web Channel
-An example extension for [Xcratch](https://xcratch.github.io/)
+Inter project communication extension for [Xcratch](https://xcratch.github.io/)
 
-This extension add extra-block "do it", that executes string in its input field as a sentence in Javascript and return the result.
+This extension provides a "Web Channel" communication system that allows Scratch projects to interact with each other through WebSocket connections. 
 
+The extension enables real-time communication between multiple Scratch projects running in different browsers or computers through a WebSocket server.
 
 ## ✨ What You Can Do With This Extension
 
-Play [Example Project](https://xcratch.github.io/editor/#https://yokobond.github.io/xcx-web-channel/projects/example.sb3) to look at what you can do with "Web Channel" extension. 
-<iframe src="https://xcratch.github.io/editor/player#https://yokobond.github.io/xcx-web-channel/projects/example.sb3" width="540px" height="460px"></iframe>
+Play [Example Project](https://xcratch.github.io/editor/#https://yokobond.github.io/xcx-web-channel/projects/cat-fight-wc.sb3) to look at what you can do with "Web Channel" extension. 
+
+This is a two-player battle game where:
+- Open the project in two windows (can be on different PCs)
+- Click the green flag to start
+- Select your character by clicking on either cat 
+- Use left/right arrow keys to move your character (movement syncs across both windows)
+- Use up arrow key to attack
+- Use down arrow key to defend
+
+<iframe src="https://xcratch.github.io/editor/player#https://yokobond.github.io/xcx-web-channel/projects/cat-fight-wc.sb3" width="540px" height="460px"></iframe>
+
+
+## Blocks Provided
+
+This extension provides the following blocks:
+
+### Channel Management
+- Join channel with specified name on a server
+- Leave channel 
+- Report current server URI and channel name
+
+### Data Sharing
+- Set shared values with key-value pairs
+- Get values by key
+
+### Event System
+- Send events with type and data
+- Receive events from other connected projects
+- Get last received event type and data
 
 
 ## How to Use in Xcratch
