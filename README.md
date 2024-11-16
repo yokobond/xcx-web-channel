@@ -12,6 +12,7 @@ Play [Example Project](https://xcratch.github.io/editor/#https://yokobond.github
 This is a two-player battle game where:
 - Open the project in two windows (can be on different PCs)
 - Click the green flag to start
+- Put channel name "cat-fight" in the input field and click "check" button
 - Select your character by clicking on either cat 
 - Use left/right arrow keys to move your character (movement syncs across both windows)
 - Use up arrow key to attack

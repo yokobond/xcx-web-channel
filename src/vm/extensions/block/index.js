@@ -396,7 +396,7 @@ class ExtensionBlocks {
      * @return {string} - the channel name.
      */
     reportChannelName () {
-        return this.channelSession ? this.channelSession.channelName : 'no channel joined';
+        return this.channelSession ? this.channelSession.channelName : '';
     }
 
     /**
