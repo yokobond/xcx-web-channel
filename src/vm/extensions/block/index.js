@@ -357,15 +357,18 @@ class ExtensionBlocks {
      * Disconnect from the server.
      */
     disconnectServer () {
-        if (this.serverSocket) {
-            if (this.serverSocket.readyState !== WebSocket.CLOSED) {
-                this.serverSocket.close();
-            }
-            this.serverSocket = null;
-            const serverURI = this.serverURI;
-            this.serverURI = null;
-            log.info(`WebSocket disconnected: ${serverURI}`);
+        if (!this.serverSocket) {
+            return;
         }
+        if (
+            (this.serverSocket.readyState !== WebSocket.CLOSED) &&
+            (this.serverSocket.readyState !== WebSocket.CLOSING)) {
+            this.serverSocket.close();
+        }
+        this.serverSocket = null;
+        const serverURI = this.serverURI;
+        this.serverURI = null;
+        log.info(`WebSocket disconnected: ${serverURI}`);
     }
 
     /**
@@ -381,14 +384,14 @@ class ExtensionBlocks {
      * @return {string} - the result of leaving the channel.
      */
     leaveChannel () {
-        const channelName = this.channelSession ? this.channelSession.channelName : null;
-        if (this.channelSession) {
-            this.channelSession.close();
-            this.channelSession = null;
-            log.info(`left from ${channelName}`);
+        if (!this.channelSession) {
+            return 'no channel joined';
         }
+        const channelName = this.channelSession.channelName;
+        this.channelSession.close();
+        this.channelSession = null;
         this.disconnectServer();
-        return channelName ? `left from ${channelName}` : 'no channel joined';
+        return `left from ${channelName}`;
     }
 
     /**

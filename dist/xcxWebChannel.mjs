@@ -1859,15 +1859,16 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "disconnectServer",
     value: function disconnectServer() {
-      if (this.serverSocket) {
-        if (this.serverSocket.readyState !== WebSocket.CLOSED) {
-          this.serverSocket.close();
-        }
-        this.serverSocket = null;
-        var serverURI = this.serverURI;
-        this.serverURI = null;
-        log$1.info("WebSocket disconnected: ".concat(serverURI));
+      if (!this.serverSocket) {
+        return;
       }
+      if (this.serverSocket.readyState !== WebSocket.CLOSED && this.serverSocket.readyState !== WebSocket.CLOSING) {
+        this.serverSocket.close();
+      }
+      this.serverSocket = null;
+      var serverURI = this.serverURI;
+      this.serverURI = null;
+      log$1.info("WebSocket disconnected: ".concat(serverURI));
     }
 
     /**
@@ -1887,14 +1888,14 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "leaveChannel",
     value: function leaveChannel() {
-      var channelName = this.channelSession ? this.channelSession.channelName : null;
-      if (this.channelSession) {
-        this.channelSession.close();
-        this.channelSession = null;
-        log$1.info("left from ".concat(channelName));
+      if (!this.channelSession) {
+        return 'no channel joined';
       }
+      var channelName = this.channelSession.channelName;
+      this.channelSession.close();
+      this.channelSession = null;
       this.disconnectServer();
-      return channelName ? "left from ".concat(channelName) : 'no channel joined';
+      return "left from ".concat(channelName);
     }
 
     /**
@@ -1904,7 +1905,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "reportChannelName",
     value: function reportChannelName() {
-      return this.channelSession ? this.channelSession.channelName : 'no channel joined';
+      return this.channelSession ? this.channelSession.channelName : '';
     }
 
     /**
