@@ -1,14 +1,14 @@
 {
   "en": {
     "xcxWebChannel.entry.name": "Web Channel",
-    "xcxWebChannel.entry.description": "Description of this extension"
+    "xcxWebChannel.entry.description": "Communicate with another project through the WebSocket."
   },
   "ja": {
     "xcxWebChannel.entry.name": "Web Channel",
-    "xcxWebChannel.entry.description": "拡張機能の説明"
+    "xcxWebChannel.entry.description": "WebSocketを通じて別のプロジェクトと通信します。"
   },
   "ja-Hira": {
     "xcxWebChannel.entry.name": "Web Channel",
-    "xcxWebChannel.entry.description": "かくちょうきのうのせつめい"
+    "xcxWebChannel.entry.description": "WebSocket を つうじて べつ の プロジェクト と つうしん します。"
   }
 }

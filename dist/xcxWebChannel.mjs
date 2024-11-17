@@ -4,18 +4,18 @@ var img$1 = "data:image/svg+xml,%3c%3fxml version='1.0' encoding='UTF-8' standal
 
 var en$1 = {
 	"xcxWebChannel.entry.name": "Web Channel",
-	"xcxWebChannel.entry.description": "Description of this extension"
+	"xcxWebChannel.entry.description": "Communicate with another project through the WebSocket."
 };
 var ja$1 = {
 	"xcxWebChannel.entry.name": "Web Channel",
-	"xcxWebChannel.entry.description": "拡張機能の説明"
+	"xcxWebChannel.entry.description": "WebSocketを通じて別のプロジェクトと通信します。"
 };
 var translations$1 = {
 	en: en$1,
 	ja: ja$1,
 	"ja-Hira": {
 	"xcxWebChannel.entry.name": "Web Channel",
-	"xcxWebChannel.entry.description": "かくちょうきのうのせつめい"
+	"xcxWebChannel.entry.description": "WebSocket を つうじて べつ の プロジェクト と つうしん します。"
 }
 };
 
