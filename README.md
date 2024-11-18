@@ -5,6 +5,9 @@ This extension provides a "Web Channel" communication system that allows Scratch
 
 The extension enables real-time communication between multiple Scratch projects running in different browsers or computers through a WebSocket server.
 
+This extension uses [Web Channel Server](https://github.com/yokobond/xcx-web-channel-server) as a WebSocket server.
+
+
 ## ✨ What You Can Do With This Extension
 
 Play [Example Project](https://xcratch.github.io/editor/#https://yokobond.github.io/xcx-web-channel/projects/cat-fight-wc.sb3) to look at what you can do with "Web Channel" extension. 
