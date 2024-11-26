@@ -1432,11 +1432,11 @@ var WebChannelSession = /*#__PURE__*/function () {
     value: function processMessage(message) {
       switch (message.type) {
         case 'SET_VALUE':
-          this.values[message.key] = message.value;
+          this.values[message.content.key] = message.content.value;
           break;
         case 'EVENT':
-          this.lastEvent = message.data;
-          this.notifyBroadcastEventListeners(this.lastEvent);
+          this.lastEvent = message.content;
+          this.notifyBroadcastEventListeners(message.content);
           break;
         default:
           console.error("Unknown message type:".concat(message.type));
@@ -1512,8 +1512,10 @@ var WebChannelSession = /*#__PURE__*/function () {
     value: function setValue(key, value) {
       var message = {
         type: 'SET_VALUE',
-        key: key,
-        value: value
+        content: {
+          key: key,
+          value: value
+        }
       };
       if (!this.channel) {
         return;
@@ -1548,12 +1550,14 @@ var WebChannelSession = /*#__PURE__*/function () {
     value: function broadcastEvent(type, data) {
       var message = {
         type: 'EVENT',
-        data: {
+        content: {
           type: type,
           data: data
         }
       };
       if (!this.channel) {
+        // Raise the event locally if the channel is not available
+        this.notifyBroadcastEventListeners(message.content);
         return;
       }
       var payload = JSON.stringify({
@@ -1619,6 +1623,18 @@ var ExtensionBlocks = /*#__PURE__*/function () {
      * @type {?WebChannelSession}
      */
     this.channelSession = null;
+
+    /**
+     * Local value holder when the channel is not connected.
+     * @type {object<string, string>}
+     */
+    this.channelValues = {};
+
+    /**
+     * Local event holder when the channel is not connected.
+     * @type {object}
+     */
+    this.lastChannelEvent = null;
   }
 
   /**
@@ -1917,12 +1933,16 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "valueOf",
     value: function valueOf(args) {
-      var key = Cast$1.toString(args.KEY);
+      var key = String(args.KEY).trim();
       if (!this.channelSession) {
-        return '';
+        return this.channelValues[key] ? this.channelValues[key] : '';
       }
       var value = this.channelSession.getValue(key);
-      return value ? value : '';
+      if (typeof value === 'undefined') {
+        return '';
+      }
+      this.channelValues[key] = value;
+      return value;
     }
 
     /**
@@ -1935,11 +1955,12 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "setValue",
     value: function setValue(args) {
-      var key = Cast$1.toString(args.KEY);
+      var key = String(args.KEY).trim();
       var value = Cast$1.toString(args.VALUE);
       log$1.debug("setValue: ".concat(key, " = ").concat(value));
       if (!this.channelSession) {
-        return 'no channel joined';
+        this.channelValues[key] = value;
+        return Promise.resolve("local ".concat(key, " = ").concat(value));
       }
       try {
         this.channelSession.setValue(key, value);
@@ -1947,7 +1968,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
         return error.message;
       }
       // resolve after a delay to process another message when this block is used in a loop.
-      return Promise.resolve("set ".concat(key, " = ").concat(value));
+      return Promise.resolve("published ".concat(key, " = ").concat(value));
     }
 
     /**
@@ -1956,7 +1977,8 @@ var ExtensionBlocks = /*#__PURE__*/function () {
      */
   }, {
     key: "onEvent",
-    value: function onEvent() {
+    value: function onEvent(event) {
+      this.lastChannelEvent = event;
       this.runtime.startHats('xcxWebChannel_whenEventReceived');
     }
 
@@ -1967,10 +1989,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "lastEventType",
     value: function lastEventType() {
-      if (!this.channelSession) {
-        return '';
-      }
-      var event = this.channelSession.lastEvent;
+      var event = this.lastChannelEvent;
       return event ? event.type : '';
     }
 
@@ -1981,12 +2000,8 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "lastEventData",
     value: function lastEventData() {
-      var event = this.channelSession ? this.channelSession.lastEvent : null;
-      if (!event) {
-        return '';
-      }
-      var data = event.data;
-      return data ? data : '';
+      var event = this.lastChannelEvent;
+      return event ? event.data : '';
     }
 
     /**
@@ -1999,10 +2014,14 @@ var ExtensionBlocks = /*#__PURE__*/function () {
   }, {
     key: "sendEvent",
     value: function sendEvent(args) {
-      var type = Cast$1.toString(args.TYPE).trim();
+      var type = String(args.TYPE).trim();
       var data = Cast$1.toString(args.DATA);
       if (!this.channelSession) {
-        return Promise.resolve('no channel joined');
+        this.onEvent({
+          type: type,
+          data: data
+        });
+        return Promise.resolve("local event: ".concat(type, " data: ").concat(data));
       }
       try {
         this.channelSession.broadcastEvent(type, data);
@@ -2010,7 +2029,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
         return Promise.resolve(error.message);
       }
       // resolve after a delay for the broadcast event to be received.
-      return Promise.resolve("sent event: ".concat(type, " data: ").concat(data));
+      return Promise.resolve("published event: ".concat(type, " data: ").concat(data));
     }
   }], [{
     key: "formatMessage",

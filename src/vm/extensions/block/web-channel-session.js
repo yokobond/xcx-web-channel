@@ -98,11 +98,11 @@ export class WebChannelSession {
     processMessage (message) {
         switch (message.type) {
         case 'SET_VALUE':
-            this.values[message.key] = message.value;
+            this.values[message.content.key] = message.content.value;
             break;
         case 'EVENT':
-            this.lastEvent = message.data;
-            this.notifyBroadcastEventListeners(this.lastEvent);
+            this.lastEvent = message.content;
+            this.notifyBroadcastEventListeners(message.content);
             break;
         default:
             console.error(`Unknown message type:${message.type}`);
@@ -164,8 +164,10 @@ export class WebChannelSession {
     setValue (key, value) {
         const message = {
             type: 'SET_VALUE',
-            key: key,
-            value: value
+            content: {
+                key: key,
+                value: value
+            }
         };
         if (!this.channel) {
             return;
@@ -196,12 +198,14 @@ export class WebChannelSession {
     broadcastEvent (type, data) {
         const message = {
             type: 'EVENT',
-            data: {
+            content: {
                 type: type,
                 data: data
             }
         };
         if (!this.channel) {
+            // Raise the event locally if the channel is not available
+            this.notifyBroadcastEventListeners(message.content);
             return;
         }
         const payload = JSON.stringify({
