@@ -105,6 +105,18 @@ class ExtensionBlocks {
          * @type {?WebChannelSession}
          */
         this.channelSession = null;
+
+        /**
+         * Local value holder when the channel is not connected.
+         * @type {object<string, string>}
+         */
+        this.channelValues = {};
+
+        /**
+         * Local event holder when the channel is not connected.
+         * @type {object}
+         */
+        this.lastChannelEvent = null;
     }
 
     /**
@@ -409,12 +421,16 @@ class ExtensionBlocks {
      * @return {string} - the value of the key.
      */
     valueOf (args) {
-        const key = Cast.toString(args.KEY);
+        const key = String(args.KEY).trim();
         if (!this.channelSession) {
-            return '';
+            return this.channelValues[key] ? this.channelValues[key] : '';
         }
         const value = this.channelSession.getValue(key);
-        return value ? value : '';
+        if (typeof value === 'undefined') {
+            return '';
+        }
+        this.channelValues[key] = value;
+        return value;
     }
 
     /**
@@ -425,11 +441,12 @@ class ExtensionBlocks {
      * @return {string} - the result of setting the value.
      */
     setValue (args) {
-        const key = Cast.toString(args.KEY);
+        const key = String(args.KEY).trim();
         const value = Cast.toString(args.VALUE);
         log.debug(`setValue: ${key} = ${value}`);
         if (!this.channelSession) {
-            return 'no channel joined';
+            this.channelValues[key] = value;
+            return Promise.resolve(`local ${key} = ${value}`);
         }
         try {
             this.channelSession.setValue(key, value);
@@ -437,14 +454,15 @@ class ExtensionBlocks {
             return error.message;
         }
         // resolve after a delay to process another message when this block is used in a loop.
-        return Promise.resolve(`set ${key} = ${value}`);
+        return Promise.resolve(`published ${key} = ${value}`);
     }
 
     /**
      * Handle the event.
      * @param {object} event - the event.
      */
-    onEvent () {
+    onEvent (event) {
+        this.lastChannelEvent = event;
         this.runtime.startHats('xcxWebChannel_whenEventReceived');
     }
 
@@ -453,10 +471,7 @@ class ExtensionBlocks {
      * @return {string} - the last event type.
      */
     lastEventType () {
-        if (!this.channelSession) {
-            return '';
-        }
-        const event = this.channelSession.lastEvent;
+        const event = this.lastChannelEvent;
         return event ? event.type : '';
     }
 
@@ -465,12 +480,8 @@ class ExtensionBlocks {
      * @return {string} - the last event data.
      */
     lastEventData () {
-        const event = this.channelSession ? this.channelSession.lastEvent : null;
-        if (!event) {
-            return '';
-        }
-        const data = event.data;
-        return data ? data : '';
+        const event = this.lastChannelEvent;
+        return event ? event.data : '';
     }
 
     /**
@@ -481,10 +492,11 @@ class ExtensionBlocks {
      * @return {Promise<string>} - resolve with the result of sending the event.
      */
     sendEvent (args) {
-        const type = Cast.toString(args.TYPE).trim();
+        const type = String(args.TYPE).trim();
         const data = Cast.toString(args.DATA);
         if (!this.channelSession) {
-            return Promise.resolve('no channel joined');
+            this.onEvent({type: type, data: data});
+            return Promise.resolve(`local event: ${type} data: ${data}`);
         }
         try {
             this.channelSession.broadcastEvent(type, data);
@@ -492,7 +504,7 @@ class ExtensionBlocks {
             return Promise.resolve(error.message);
         }
         // resolve after a delay for the broadcast event to be received.
-        return Promise.resolve(`sent event: ${type} data: ${data}`);
+        return Promise.resolve(`published event: ${type} data: ${data}`);
     }
 }
 
