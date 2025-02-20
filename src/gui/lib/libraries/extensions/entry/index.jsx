@@ -24,16 +24,17 @@ const entry = {
     },
     extensionId: 'xcxWebChannel',
     extensionURL: 'https://yokobond.github.io/xcx-web-channel/dist/xcxWebChannel.mjs',
-    collaborator: 'yokobond',
+    collaborator: 'Yengawa Lab',
     iconURL: iconURL,
     insetIconURL: insetIconURL,
     get description () {
         return formatMessage({
-            defaultMessage: 'an extension for Xcratch',
+            defaultMessage: 'Communicate with another project through the WebSocket.',
             description: 'Description for this extension',
             id: 'xcxWebChannel.entry.description'
         });
     },
+    tags: ['network', 'web', 'communication', 'websocket'],
     featured: true,
     disabled: false,
     bluetoothRequired: false,

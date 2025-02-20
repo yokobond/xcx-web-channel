@@ -43,16 +43,17 @@ var entry = {
   },
   extensionId: 'xcxWebChannel',
   extensionURL: 'https://yokobond.github.io/xcx-web-channel/dist/xcxWebChannel.mjs',
-  collaborator: 'yokobond',
+  collaborator: 'Yengawa Lab',
   iconURL: img$2,
   insetIconURL: img$1,
   get description() {
     return formatMessage$1({
-      defaultMessage: 'an extension for Xcratch',
+      defaultMessage: 'Communicate with another project through the WebSocket.',
       description: 'Description for this extension',
       id: 'xcxWebChannel.entry.description'
     });
   },
+  tags: ['network', 'web', 'communication', 'websocket'],
   featured: true,
   disabled: false,
   bluetoothRequired: false,
@@ -195,10 +196,8 @@ var ArgumentType = {
 var argumentType = ArgumentType;
 var ArgumentType$1 = /*@__PURE__*/getDefaultExportFromCjs(argumentType);
 
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+function _classCallCheck(a, n) {
+  if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
 }
 
 function _typeof(o) {
@@ -224,24 +223,19 @@ function toPrimitive(t, r) {
 
 function toPropertyKey(t) {
   var i = toPrimitive(t, "string");
-  return "symbol" == _typeof(i) ? i : String(i);
+  return "symbol" == _typeof(i) ? i : i + "";
 }
 
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, toPropertyKey(descriptor.key), descriptor);
+function _defineProperties(e, r) {
+  for (var t = 0; t < r.length; t++) {
+    var o = r[t];
+    o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, toPropertyKey(o.key), o);
   }
 }
-function _createClass(Constructor, protoProps, staticProps) {
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  Object.defineProperty(Constructor, "prototype", {
-    writable: false
-  });
-  return Constructor;
+function _createClass(e, r, t) {
+  return t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
+    writable: !1
+  }), e;
 }
 
 var Color$1 = /*#__PURE__*/function () {
